@@ -128,6 +128,35 @@ export const NoticeDetail: React.FC = () => {
     });
   };
 
+  // Force download cross-origin files by converting to Blob
+  const handleDownload = async (fileUrl: string, fileName: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const backendUrl = import.meta.env.VITE_API_URL 
+        ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
+        : 'http://localhost:5000';
+      const response = await fetch(`${backendUrl}${fileUrl}`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Failed to download PDF:', error);
+      // Fallback: open in new tab
+      const backendUrl = import.meta.env.VITE_API_URL 
+        ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
+        : 'http://localhost:5000';
+      window.open(`${backendUrl}${fileUrl}`, '_blank');
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 animate-pulse">
@@ -360,29 +389,54 @@ export const NoticeDetail: React.FC = () => {
 
             {pdfs.length > 0 ? (
               <div className="space-y-2">
-                {pdfs.map((pdf, idx) => (
-                  <a
-                    key={idx}
-                    href={`http://localhost:5000${pdf.fileUrl}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl border border-slate-150 dark:border-slate-800 hover:border-brand-500/50 hover:bg-slate-50 dark:hover:bg-slate-950 transition-all duration-200 group"
-                  >
-                    <div className="flex items-center space-x-2 truncate">
-                      <FileText className="h-4 w-4 text-rose-500 shrink-0" />
-                      <span className="text-xs text-slate-700 dark:text-slate-350 truncate font-medium group-hover:text-brand-500 transition-colors">
-                        {pdf.fileName}
-                      </span>
-                    </div>
-                    
-                    <span 
-                      className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 group-hover:bg-brand-500 group-hover:text-white group-hover:border-brand-500 text-slate-400 transition-colors shrink-0"
-                      title="Download PDF"
+                {pdfs.map((pdf, idx) => {
+                  const backendUrl = import.meta.env.VITE_API_URL 
+                    ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
+                    : 'http://localhost:5000';
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 rounded-xl border border-slate-150 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 transition-all duration-200 group"
                     >
-                      <Download className="h-3.5 w-3.5" />
-                    </span>
-                  </a>
-                ))}
+                      {/* Left side: View Link (File Icon + Name) */}
+                      <a
+                        href={`${backendUrl}${pdf.fileUrl}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center space-x-2 truncate flex-1 hover:text-brand-500 transition-colors cursor-pointer"
+                        title="View PDF"
+                      >
+                        <FileText className="h-4 w-4 text-rose-500 shrink-0" />
+                        <span className="text-xs text-slate-700 dark:text-slate-350 truncate font-medium">
+                          {pdf.fileName}
+                        </span>
+                      </a>
+                      
+                      {/* Right side: Action Buttons */}
+                      <div className="flex items-center space-x-1.5 shrink-0 ml-2">
+                        {/* View Button */}
+                        <a
+                          href={`${backendUrl}${pdf.fileUrl}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-brand-500 hover:border-brand-500/50 hover:bg-brand-50/50 dark:hover:bg-slate-950 transition-all cursor-pointer"
+                          title="View PDF in New Tab"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </a>
+
+                        {/* Download Button */}
+                        <button
+                          onClick={(e) => handleDownload(pdf.fileUrl, pdf.fileName, e)}
+                          className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-brand-500 hover:border-brand-500/50 hover:bg-brand-50/50 dark:hover:bg-slate-950 transition-all cursor-pointer"
+                          title="Download PDF"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-6 px-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
