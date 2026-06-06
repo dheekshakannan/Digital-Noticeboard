@@ -31,3 +31,13 @@ export const authenticateJWT = (req: CustomRequest, res: Response, next: NextFun
     return res.status(401).json({ success: false, message: 'Unauthorized: Access token missing' });
   }
 };
+
+/**
+ * Middleware function that checks if the logged-in user is an administrator.
+ */
+export const requireAdmin = (req: CustomRequest, res: Response, next: NextFunction) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ success: false, message: 'Forbidden: Administrator access required.' });
+  }
+  next();
+};

@@ -12,9 +12,9 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // If already logged in, redirect straight to dashboard
+  // If already logged in, redirect straight to notice board
   if (user) {
-    return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +29,7 @@ export const Login: React.FC = () => {
 
     try {
       await login(usernameOrEmail, password);
-      navigate('/admin/dashboard');
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please verify credentials.');
     } finally {
@@ -60,11 +60,11 @@ export const Login: React.FC = () => {
           <div className="inline-flex p-3 rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-950/40 dark:text-brand-400 mb-3 hover:scale-105 transition-transform">
             <KeyRound className="h-6 w-6" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">
-            Administrator Gateway
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-850 dark:text-white tracking-tight">
+            Notice Board Portal
           </h2>
           <p className="mt-1.5 text-xxs text-slate-450 dark:text-slate-500 font-semibold tracking-wider uppercase">
-            Digital Notice Board
+            Sign In to Access Notices
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export const Login: React.FC = () => {
                 <span>Verifying credentials...</span>
               </>
             ) : (
-              <span>Unlock Dashboard</span>
+              <span>Sign In</span>
             )}
           </button>
 
@@ -135,10 +135,12 @@ export const Login: React.FC = () => {
 
         {/* Seed helper tooltip for local students learning development */}
         <div className="text-center pt-2.5 border-t border-slate-100 dark:border-slate-850">
-          <p className="text-xxs text-slate-400 dark:text-slate-550 leading-relaxed font-semibold">
-            DEVELOPMENT NOTE: Default Admin credentials seeded at bootup:
+          <p className="text-xxs text-slate-405 dark:text-slate-550 leading-relaxed font-semibold">
+            DEVELOPMENT NOTE: Seeded credentials for trial:
             <br />
-            <span className="text-brand-500 dark:text-brand-400">admin / admin123</span>
+            Admin: <span className="text-brand-500 dark:text-brand-400">admin / admin123</span>
+            <br />
+            Student: <span className="text-brand-500 dark:text-brand-400 font-bold">student / student123</span>
           </p>
         </div>
 

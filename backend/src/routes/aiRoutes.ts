@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { generateSummary } from '../config/ai';
-import { authenticateJWT } from '../middleware/auth';
+import { authenticateJWT, requireAdmin } from '../middleware/auth';
 
 const router = Router();
 
 // Route: POST /api/ai/summarize (Admin Protected)
 // Takes { title, content } and returns the generated bullet highlights
-router.post('/summarize', authenticateJWT, async (req: Request, res: Response): Promise<void> => {
+router.post('/summarize', authenticateJWT, requireAdmin, async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, content } = req.body;
     

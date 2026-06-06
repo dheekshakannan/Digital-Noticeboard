@@ -7,6 +7,7 @@ import { NoticeDetail } from './pages/NoticeDetail';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { NoticeForm } from './pages/NoticeForm';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -17,15 +18,15 @@ function App() {
             <Navbar />
             <main className="flex-grow pb-16">
               <Routes>
-                {/* Student Public Interfaces */}
-                <Route path="/" element={<Home />} />
-                <Route path="/notice/:id" element={<NoticeDetail />} />
+                {/* Student Protected Interfaces */}
+                <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/notice/:id" element={<ProtectedRoute><NoticeDetail /></ProtectedRoute>} />
                 
                 {/* Admin Gateways */}
                 <Route path="/login" element={<Login />} />
-                <Route path="/admin/dashboard" element={<Dashboard />} />
-                <Route path="/admin/create" element={<NoticeForm />} />
-                <Route path="/admin/edit/:id" element={<NoticeForm />} />
+                <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/admin/create" element={<ProtectedRoute><NoticeForm /></ProtectedRoute>} />
+                <Route path="/admin/edit/:id" element={<ProtectedRoute><NoticeForm /></ProtectedRoute>} />
               </Routes>
             </main>
           </div>

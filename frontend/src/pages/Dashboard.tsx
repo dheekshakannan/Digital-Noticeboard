@@ -87,8 +87,8 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/" replace />;
   }
 
   // Filter notices matching search queries inside the table

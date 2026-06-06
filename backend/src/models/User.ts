@@ -6,7 +6,7 @@ export interface IUser {
   username: string;
   email: string;
   passwordHash: string;
-  role: 'admin';
+  role: 'admin' | 'student';
   createdAt: Date;
   comparePassword: (password: string) => Promise<boolean>;
 }
@@ -31,8 +31,8 @@ const userSchema = new Schema<IUser>({
   },
   role: { 
     type: String, 
-    enum: ['admin'], 
-    default: 'admin' 
+    enum: ['admin', 'student'], 
+    default: 'student' 
   },
   createdAt: { 
     type: Date, 

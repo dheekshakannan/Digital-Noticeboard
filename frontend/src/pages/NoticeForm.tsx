@@ -205,8 +205,8 @@ export const NoticeForm: React.FC = () => {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/" replace />;
   }
 
   return (
