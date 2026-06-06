@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { NoticeCard } from '../components/NoticeCard';
 import type { INotice } from '../components/NoticeCard';
-import { Search, Sparkles, Filter, Megaphone, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Search, Filter, Megaphone, RotateCcw, AlertTriangle } from 'lucide-react';
 
 const CATEGORIES = [
   'Academic',
@@ -20,7 +20,6 @@ export const Home: React.FC = () => {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const [smart, setSmart] = useState(false);
   const [triggerSearch, setTriggerSearch] = useState(0);
 
   // Fetch notices from Express API
@@ -32,7 +31,6 @@ export const Home: React.FC = () => {
         const params: any = {};
         if (category) params.category = category;
         if (search.trim()) params.search = search.trim();
-        if (smart) params.smart = true;
 
         const response = await api.get('/notices', { params });
         if (response.data.success) {
@@ -47,7 +45,7 @@ export const Home: React.FC = () => {
     };
 
     fetchNotices();
-  }, [category, smart, triggerSearch]);
+  }, [category, triggerSearch]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +55,6 @@ export const Home: React.FC = () => {
   const resetFilters = () => {
     setSearch('');
     setCategory('');
-    setSmart(false);
     setTriggerSearch(prev => prev + 1);
   };
 
@@ -71,7 +68,7 @@ export const Home: React.FC = () => {
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="absolute -left-10 -top-10 w-40 h-40 rounded-full bg-white/10 blur-2xl"></div>
         <div className="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-brand-500/30 blur-2xl"></div>
-
+ 
         <div className="relative z-10 max-w-2xl mx-auto">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-xs font-semibold uppercase tracking-wider mb-4 animate-pulse">
             <Megaphone className="h-4 w-4 text-amber-300" />
@@ -98,31 +95,16 @@ export const Home: React.FC = () => {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
               <input
                 type="text"
-                placeholder={smart ? "Ask AI, e.g., 'placement drives for final years'..." : "Search notices by keywords..."}
+                placeholder="Search notices by keywords..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white interactive-transition"
               />
             </div>
 
-            {/* Smart Search & Actions */}
+            {/* Actions */}
             <div className="flex flex-wrap items-center gap-3">
               
-              {/* Gemini Smart Search Toggle */}
-              <button
-                type="button"
-                onClick={() => setSmart(!smart)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-xl text-sm font-semibold border interactive-transition ${
-                  smart 
-                    ? 'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-900/60 shadow-sm' 
-                    : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900'
-                }`}
-                title="Use Gemini AI semantic mapping to parse notice meanings instead of matching letters"
-              >
-                <Sparkles className={`h-4 w-4 ${smart ? 'text-amber-500 animate-spin-slow' : 'text-slate-400'}`} />
-                <span>Smart AI Search</span>
-              </button>
-
               <button
                 type="submit"
                 className="px-5 py-3 rounded-xl text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 hover:scale-102 active:scale-98 transition-all duration-200 shadow-md shadow-brand-500/10 cursor-pointer"
@@ -130,7 +112,7 @@ export const Home: React.FC = () => {
                 Search
               </button>
 
-              {(search || category || smart) && (
+              {(search || category) && (
                 <button
                   type="button"
                   onClick={resetFilters}
@@ -198,7 +180,7 @@ export const Home: React.FC = () => {
         // Grid of skeletons loading state
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="animate-pulse p-5 rounded-2xl border border-slate-200 dark:border-slate-850 bg-white dark:bg-slate-900 h-52 flex flex-col justify-between">
+            <div key={i} className="animate-pulse p-5 rounded-2xl border border-slate-200 dark:border-slate-855 bg-white dark:bg-slate-900 h-52 flex flex-col justify-between">
               <div>
                 <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/4 mb-4"></div>
                 <div className="h-5 bg-slate-200 dark:bg-slate-800 rounded w-3/4 mb-3"></div>
@@ -227,16 +209,16 @@ export const Home: React.FC = () => {
             No Active Notices
           </h3>
           
-          <p className="mt-2 text-xs text-slate-400 dark:text-slate-500 max-w-md mx-auto leading-relaxed">
+          <p className="mt-2 text-xs text-slate-450 dark:text-slate-500 max-w-md mx-auto leading-relaxed">
             {search || category
-              ? "We couldn't find anything matching your search filters. Try clearing inputs or toggling standard search mode."
+              ? "We couldn't find anything matching your search filters. Try clearing inputs or changing category filters."
               : "Check back later! Fresh academic briefings, circulars, and campus events will show up here as administrators post them."}
           </p>
 
-          {(search || category || smart) && (
+          {(search || category) && (
             <button
               onClick={resetFilters}
-              className="mt-5 px-4.5 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-950 text-slate-600 dark:text-slate-300 transition-all duration-200"
+              className="mt-5 px-4.5 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-950 text-slate-650 dark:text-slate-350 transition-all duration-200"
             >
               Reset Search & Filters
             </button>

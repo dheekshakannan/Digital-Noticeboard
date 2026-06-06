@@ -45,7 +45,7 @@ graph TD
     ServerEntry --> UploadMW
     ServerEntry --> AuthCtrl
     ServerEntry --> NoticeCtrl
-    NoticeCtrl -->|Summarize & Smart Search| Gemini
+    NoticeCtrl -->|Summarize Notice| Gemini
     
     AuthCtrl -->|Users Collection| Mongo
     NoticeCtrl -->|Notices Collection| Mongo
@@ -123,19 +123,13 @@ When an admin creates or edits a notice:
 3.  The backend stores the generated summary directly in the notice database document. This enables the frontend to fetch and render the summary instantly for students, bypassing the latency of making live AI requests every time a student views a notice.
 4.  **Local Fallback**: If the admin has not configured a Gemini API key, the summarizer splits the notice text into sentences, extracts the first few lines, formats them as bullets, and returns them as a fallback.
 
-### 5. Smart AI Semantic Search
-Standard databases use keyword match queries. For example, searching "placements" might not return a notice titled "Career Recruitment Drive" because the words don't match.
-*   **Smart Search** solves this. When toggled, the search text and all active notice titles are sent to Gemini.
-*   The AI evaluates the semantic intent of the query and returns a ranked list of relevant notices.
-*   If the Gemini API key is missing, the system falls back to a regex scoring algorithm matching queries against notice titles and categories.
-
-### 6. Client-Side AI Voice Reader
+### 5. Client-Side AI Voice Reader
 Rather than paying for expensive cloud text-to-speech services, the notice reader uses the browser's built-in **Web Speech API** (`SpeechSynthesis`).
 *   It converts notice text into raw speech natively on the student's device.
 *   The component tracks speech states (`playing`, `paused`, `idle`) and provides speed rate modifiers (0.5x to 2x).
 *   **Resource Cleanup**: Speech synthesis runs in the browser background. When a student navigates away from a notice page, the component's `useEffect` cleanup hook fires `window.speechSynthesis.cancel()`, preventing the voice from continuing to read in the background.
 
-### 7. Responsive Dark Mode with Tailwind CSS
+### 6. Responsive Dark Mode with Tailwind CSS
 Tailwind uses CSS classes to control styling.
 *   Our theme provider sets up a theme state (`light` or `dark`) stored in the browser's `localStorage` to remember user preferences.
 *   Tailwind's `darkMode: 'class'` configuration looks for the `dark` class on the `<html>` or `<body>` element.
