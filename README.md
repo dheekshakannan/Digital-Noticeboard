@@ -68,14 +68,15 @@ npm run install:all
 This single script installs dependencies for the root coordinator, backend server, and frontend client.
 
 ### Environment Configuration
-1.  Go to the `backend/` directory and open the `.env` file:
-    ```env
-    PORT=5000
-    MONGODB_URI=mongodb://127.0.0.1:27017/digital_noticeboard
-    JWT_SECRET=supersecret_noticeboard_key_123!
-    GEMINI_API_KEY=
+1.  Go to the `backend/` directory and copy the template file `.env.example` to create `.env`:
+    ```bash
+    cp .env.example .env
     ```
-2.  **Gemini API Key**: If you want to enable the AI features, generate a free API key at [Google AI Studio](https://aistudio.google.com/) and paste it next to `GEMINI_API_KEY=`. If left empty, the application will fallback to local keyword search and structural text summarizers automatically.
+2.  Open the newly created `.env` file and configure your keys:
+    *   **PORT**: The port the backend server listens on (defaults to `5000`).
+    *   **MONGODB_URI**: Your database connection string. You can use a local database link or a cloud link from your **MongoDB Atlas** account (e.g., `mongodb+srv://...`).
+    *   **JWT_SECRET**: A secure random secret key used to sign admin session tokens.
+    *   **GEMINI_API_KEY**: To enable smart AI features, generate a free key at [Google AI Studio](https://aistudio.google.com/) and paste it here. If left empty, the application will automatically fall back to local text cutters and keyword search algorithms.
 
 ### Running the Project Locally
 To boot both the backend API and frontend dev server simultaneously, run this command from the root directory:
@@ -105,11 +106,14 @@ How does the administrator log in securely without keeping constant connections 
 3.  **Token Issuance**: If the password matches, the server generates a **JSON Web Token (JWT)** containing the user's ID and role, signed with a secret key (`JWT_SECRET`).
 4.  **Middleware Guard**: Administrative endpoints (like posting or deleting a notice) are protected by a middleware function (`authenticateJWT`). This function checks the incoming request headers for a `Bearer <token>` string, verifies it, and rejects the request with a `401 Unauthorized` status if the token is missing or expired.
 
-### 3. File Attachments using Multer
+### 3. File Attachments & Dual-Action Downloads
 HTML forms send standard text inputs, but uploading files requires sending data as `multipart/form-data`.
 *   **Multer** is a middleware that intercepts these requests, extracts file buffers (images/PDFs), generates a unique filename, and writes the file directly to the backend disk (`backend/uploads/`).
 *   The notice document stores only the *static relative path URL* (e.g., `/uploads/attachments-12345.pdf`).
-*   **Static Assets serving**: In `server.ts`, we tell Express to serve the `/uploads` folder as a static resource (`express.static`). This lets both students and admins view or download attachments directly via the browser.
+*   **Static Assets serving**: In `server.ts`, we tell Express to serve the `/uploads` folder as a static resource (`express.static`).
+*   **Dual-Action Attachment Interface**:
+    *   **View Link (Eye $\mathbf{\odot}$)**: Opens the PDF circular directly in a new browser tab for quick online reading using standard `<a>` tags with `target="_blank"`.
+    *   **Download Link (Download $\mathbf{\downarrow}$)**: Programmatically fetches the PDF as a binary `Blob` object, generates a local same-origin URL, and triggers a download. This bypasses browser cross-origin policy restrictions that normally prevent port-to-port downloads between the frontend (`localhost:5173`) and backend (`localhost:5000`).
 *   **Storage Cleanup**: When an admin deletes a notice, the controller retrieves file paths from the database and physically removes them from the server's hard drive using Node's file system module (`fs.unlinkSync`), keeping the server clean.
 
 ### 4. Live AI Notice Summarizer (Gemini API)
