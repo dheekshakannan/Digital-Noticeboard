@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticateJWT = void 0;
+exports.requireAdmin = exports.authenticateJWT = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 /**
  * Middleware function that checks for a JWT in the Authorization header.
@@ -28,3 +28,13 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 exports.authenticateJWT = authenticateJWT;
+/**
+ * Middleware function that checks if the logged-in user is an administrator.
+ */
+const requireAdmin = (req, res, next) => {
+    if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Forbidden: Administrator access required.' });
+    }
+    next();
+};
+exports.requireAdmin = requireAdmin;

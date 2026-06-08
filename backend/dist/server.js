@@ -7,6 +7,9 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
+const dns_1 = __importDefault(require("dns"));
+// Bypasses local ISP DNS failures by routing SRV record queries through Google's DNS
+dns_1.default.setServers(['8.8.8.8', '8.8.4.4']);
 const db_1 = require("./config/db");
 const authController_1 = require("./controllers/authController");
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));

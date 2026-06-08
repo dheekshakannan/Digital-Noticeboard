@@ -86,6 +86,7 @@ exports.getMe = getMe;
  */
 const seedDefaultAdmin = async () => {
     try {
+        // 1. Seed default admin
         const adminCount = await User_1.User.countDocuments({ role: 'admin' });
         if (adminCount === 0) {
             console.log('No administrator found in database. Seeding default admin...');
@@ -106,6 +107,29 @@ const seedDefaultAdmin = async () => {
             console.log(`Username: ${defaultUsername}`);
             console.log(`Email:    ${defaultEmail}`);
             console.log(`Password: ${defaultPassword}`);
+            console.log('----------------------------------------------------');
+        }
+        // 2. Seed default student
+        const studentCount = await User_1.User.countDocuments({ role: 'student' });
+        if (studentCount === 0) {
+            console.log('No student found in database. Seeding default student...');
+            const defaultStudentUsername = 'student';
+            const defaultStudentEmail = 'student@noticeboard.edu';
+            const defaultStudentPassword = 'student123';
+            const salt = await bcryptjs_1.default.genSalt(10);
+            const studentPasswordHash = await bcryptjs_1.default.hash(defaultStudentPassword, salt);
+            const defaultStudent = new User_1.User({
+                username: defaultStudentUsername,
+                email: defaultStudentEmail,
+                passwordHash: studentPasswordHash,
+                role: 'student'
+            });
+            await defaultStudent.save();
+            console.log('----------------------------------------------------');
+            console.log('Default Student Account Created Successfully:');
+            console.log(`Username: ${defaultStudentUsername}`);
+            console.log(`Email:    ${defaultStudentEmail}`);
+            console.log(`Password: ${defaultStudentPassword}`);
             console.log('----------------------------------------------------');
         }
     }

@@ -19,6 +19,7 @@ const noticeSchema = new mongoose_1.Schema({
     expiryDate: { type: Date, required: true },
     aiSummary: { type: String, default: '' },
     views: { type: Number, default: 0 },
+    viewedBy: { type: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }], default: [] },
     createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }
 }, {
     timestamps: true // Automatically adds createdAt and updatedAt fields

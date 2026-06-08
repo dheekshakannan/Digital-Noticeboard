@@ -12,9 +12,9 @@ import { upload } from '../middleware/upload';
 
 const router = Router();
 
-// Public Routes (Students can access these)
-router.get('/', getNotices);
-router.get('/:id', getNoticeById);
+// Protected Routes (Students and Admins can access these)
+router.get('/', authenticateJWT, getNotices);
+router.get('/:id', authenticateJWT, getNoticeById);
 
 // Admin-Protected Routes (Requires valid JWT and Admin role)
 router.get('/stats/dashboard', authenticateJWT, requireAdmin, getDashboardStats);

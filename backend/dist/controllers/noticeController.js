@@ -54,14 +54,27 @@ exports.getNotices = getNotices;
  */
 const getNoticeById = async (req, res) => {
     try {
-        const notice = await Notice_1.Notice.findById(req.params.id).populate('createdBy', 'username');
+        const userId = req.user?.id;
+        let notice;
+        if (userId) {
+            // Atomically add to viewedBy and increment views count if user has not viewed this notice yet
+            notice = await Notice_1.Notice.findOneAndUpdate({ _id: req.params.id, viewedBy: { $ne: userId } }, {
+                $push: { viewedBy: userId },
+                $inc: { views: 1 }
+            }, { new: true }).populate('createdBy', 'username');
+            // If notice is null, it means the user has already viewed it (or the notice doesn't exist).
+            // Let's fetch it normally if it wasn't matched above.
+            if (!notice) {
+                notice = await Notice_1.Notice.findById(req.params.id).populate('createdBy', 'username');
+            }
+        }
+        else {
+            notice = await Notice_1.Notice.findById(req.params.id).populate('createdBy', 'username');
+        }
         if (!notice) {
             res.status(404).json({ success: false, message: 'Notice not found.' });
             return;
         }
-        // Increment view count
-        notice.views += 1;
-        await notice.save();
         res.status(200).json({
             success: true,
             data: notice

@@ -176,7 +176,7 @@ export const Dashboard: React.FC = () => {
           {/* Card: Expired Notices */}
           <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-850 shadow-sm flex items-center justify-between">
             <div>
-              <span className="block text-xxs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Expired Bulletins</span>
+              <span className="block text-xxs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Expired Notices</span>
               <span className="block text-2xl font-extrabold text-slate-800 dark:text-white mt-1 text-rose-500">{stats.expiredNotices}</span>
             </div>
             <div className="p-3 bg-rose-50 dark:bg-rose-950/40 text-rose-500 rounded-xl">
@@ -277,13 +277,14 @@ export const Dashboard: React.FC = () => {
           </div>
           
           <div className="relative w-full sm:max-w-xs">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search table notices..."
+              placeholder="Search notices..."
               value={tableSearch}
               onChange={(e) => setTableSearch(e.target.value)}
               className="w-full pl-9.5 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white interactive-transition"
+              style={{ paddingLeft: '2.5rem' }}
             />
           </div>
         </div>

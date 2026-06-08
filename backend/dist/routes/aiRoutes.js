@@ -6,7 +6,7 @@ const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
 // Route: POST /api/ai/summarize (Admin Protected)
 // Takes { title, content } and returns the generated bullet highlights
-router.post('/summarize', auth_1.authenticateJWT, async (req, res) => {
+router.post('/summarize', auth_1.authenticateJWT, auth_1.requireAdmin, async (req, res) => {
     try {
         const { title, content } = req.body;
         if (!title || !content) {

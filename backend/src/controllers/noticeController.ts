@@ -9,7 +9,7 @@ import { CustomRequest } from '../middleware/auth';
  * Get all active notices (not expired).
  * Supports category filtering, keyword searches, and Gemini-based semantic Smart Search.
  */
-export const getNotices = async (req: Request, res: Response): Promise<void> => {
+export const getNotices = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
     const { category, search, smart, all } = req.query;
     const now = new Date();
@@ -54,18 +54,35 @@ export const getNotices = async (req: Request, res: Response): Promise<void> => 
  * Get a specific notice by ID.
  * Increments the views count by 1.
  */
-export const getNoticeById = async (req: Request, res: Response): Promise<void> => {
+export const getNoticeById = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
-    const notice = await Notice.findById(req.params.id).populate('createdBy', 'username');
+    const userId = req.user?.id;
+    let notice;
+
+    if (userId) {
+      // Atomically add to viewedBy and increment views count if user has not viewed this notice yet
+      notice = await Notice.findOneAndUpdate(
+        { _id: req.params.id, viewedBy: { $ne: userId } },
+        { 
+          $push: { viewedBy: userId },
+          $inc: { views: 1 }
+        },
+        { new: true }
+      ).populate('createdBy', 'username');
+
+      // If notice is null, it means the user has already viewed it (or the notice doesn't exist).
+      // Let's fetch it normally if it wasn't matched above.
+      if (!notice) {
+        notice = await Notice.findById(req.params.id).populate('createdBy', 'username');
+      }
+    } else {
+      notice = await Notice.findById(req.params.id).populate('createdBy', 'username');
+    }
     
     if (!notice) {
       res.status(404).json({ success: false, message: 'Notice not found.' });
       return;
     }
-
-    // Increment view count
-    notice.views += 1;
-    await notice.save();
 
     res.status(200).json({
       success: true,

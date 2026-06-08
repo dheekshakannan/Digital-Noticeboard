@@ -15,6 +15,7 @@ export interface INotice {
   expiryDate: Date;
   aiSummary?: string;
   views: number;
+  viewedBy: Types.ObjectId[];
   createdBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -38,6 +39,7 @@ const noticeSchema = new Schema<INotice>({
   expiryDate: { type: Date, required: true },
   aiSummary: { type: String, default: '' },
   views: { type: Number, default: 0 },
+  viewedBy: { type: [{ type: Schema.Types.ObjectId, ref: 'User' }], default: [] },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' }
 }, {
   timestamps: true // Automatically adds createdAt and updatedAt fields
