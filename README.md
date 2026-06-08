@@ -15,6 +15,8 @@ The project is structured into two main packages managed by a root orchestrator:
 ```mermaid
 graph TD
     subgraph Client [Frontend React App]
+        Login[Login / Sign In]
+        ProtectedRoute[ProtectedRoute Guard]
         Home[Home / Notice Board]
         Detail[Notice Detail View]
         VoiceReader[Web Speech API Reader]
@@ -27,6 +29,7 @@ graph TD
         AuthCtrl[authController.ts]
         NoticeCtrl[noticeController.ts]
         AuthMW[JWT Middleware]
+        AdminMW[requireAdmin Middleware]
         UploadMW[Multer Uploads]
         Gemini[ai.ts config]
     end
@@ -36,12 +39,19 @@ graph TD
         UploadsDir[backend/uploads/ Disk]
     end
 
+    Login -->|POST login| ServerEntry
+    ProtectedRoute -->|Wrap & Guard| Home
+    ProtectedRoute -->|Wrap & Guard| Detail
+    ProtectedRoute -->|Wrap & Guard| Dashboard
+    ProtectedRoute -->|Wrap & Guard| NoticeForm
+    
     Home -->|GET notices| ServerEntry
     Detail -->|GET notice details| ServerEntry
     Dashboard -->|GET stats & notices| ServerEntry
     NoticeForm -->|POST/PUT notice + files| ServerEntry
     
     ServerEntry --> AuthMW
+    ServerEntry --> AdminMW
     ServerEntry --> UploadMW
     ServerEntry --> AuthCtrl
     ServerEntry --> NoticeCtrl
@@ -83,9 +93,11 @@ To boot both the backend API and frontend dev server simultaneously, run this co
 ```bash
 npm run dev
 ```
-*   **Frontend Client**: [http://localhost:5173](http://localhost:5173)
+*   **Frontend Client**: [http://localhost:5173](http://localhost:5173) (requires signing in)
 *   **Backend API**: [http://localhost:5000](http://localhost:5000)
-*   **Default Admin Credentials**: Username: `admin` | Password: `admin123` *(Seeded automatically on backend boot)*
+*   **Default Trial Credentials** *(Seeded automatically on backend boot)*:
+    *   **Admin Account**: Username: `admin` | Password: `admin123`
+    *   **Student Account**: Username: `student` | Password: `student123`
 
 ---
 
@@ -99,12 +111,16 @@ Our Express backend is structured using MVC principles:
 *   **Controllers (`backend/src/controllers/`)**: House the actual logical functions (e.g., how to search notices, how to save notices, how to login).
 *   **Routes (`backend/src/routes/`)**: Map web request URLs (endpoints like `/api/notices`) to their corresponding controller functions.
 
-### 2. Secure JWT Authentication
-How does the administrator log in securely without keeping constant connections open?
-1.  **Hashing**: When the server seeds the database, it hashes the plain password `admin123` into an unreadable string using **Bcrypt**.
-2.  **Verification**: When the admin enters credentials on the login page, the server uses Bcrypt to compare the input password with the hashed password in MongoDB.
-3.  **Token Issuance**: If the password matches, the server generates a **JSON Web Token (JWT)** containing the user's ID and role, signed with a secret key (`JWT_SECRET`).
-4.  **Middleware Guard**: Administrative endpoints (like posting or deleting a notice) are protected by a middleware function (`authenticateJWT`). This function checks the incoming request headers for a `Bearer <token>` string, verifies it, and rejects the request with a `401 Unauthorized` status if the token is missing or expired.
+### 2. Secure JWT Authentication & Role-Based Access Control (RBAC)
+How does the system securely verify users and separate student access from admin controls?
+1.  **Password Hashing**: When the database is seeded or a user is created, plain passwords (e.g. `student123` or `admin123`) are hashed using **Bcrypt** before saving to MongoDB.
+2.  **Verification & Token Issuance**: When a user logs in (Admin or Student), the server verifies their credentials and generates a **JSON Web Token (JWT)** containing their User ID and Role (`'admin'` or `'student'`).
+3.  **Frontend Route Guards**: 
+    *   **ProtectedRoute**: In the React application, all notice board views (Home, Notice Detail) and management views are wrapped inside a `<ProtectedRoute>` component. If a user is not signed in, they are immediately redirected to `/login`.
+    *   **Admin Gateways**: Both the Admin Dashboard (`Dashboard.tsx`) and Notice Form (`NoticeForm.tsx`) components check `user.role === 'admin'`. If a logged-in student attempts to access these pages, they are redirected back to the Home page.
+4.  **Backend Route Guards**: 
+    *   **authenticateJWT**: Decodes the JWT from the request headers to verify that the client has a valid session.
+    *   **requireAdmin**: A second middleware applied strictly to notice-writing routes (POST, PUT, DELETE) and stats queries. If a client attempts to execute administrative calls without an `'admin'` role, the server rejects them with a `403 Forbidden` response.
 
 ### 3. File Attachments & Dual-Action Downloads
 HTML forms send standard text inputs, but uploading files requires sending data as `multipart/form-data`.
@@ -134,3 +150,10 @@ Tailwind uses CSS classes to control styling.
 *   Our theme provider sets up a theme state (`light` or `dark`) stored in the browser's `localStorage` to remember user preferences.
 *   Tailwind's `darkMode: 'class'` configuration looks for the `dark` class on the `<html>` or `<body>` element.
 *   When `dark` is active, any Tailwind class prefixed with `dark:` (e.g., `bg-white dark:bg-slate-900`) is automatically applied, creating a smooth dark mode transition.
+
+### 7. Local Timezone Notice Expiration (End-of-Day IST)
+How do notice boards automatically expire notices exactly at the end of the day, respecting the local timezone?
+1.  **Date Offset Issue**: Standard date inputs return strings like `"2026-06-08"`. Parsing this directly using `new Date()` defaults to UTC Midnight (`2026-06-08T00:00:00.000Z`), which translates to 5:30 AM Indian Standard Time (IST) due to the +5.5 hour offset. This would cause notices to expire early in the morning on the selected day.
+2.  **End-of-Day Parser**: During notice submission, the frontend code explicitly appends the local end-of-day time `T23:59:59` to the date string (e.g. `new Date("2026-06-08T23:59:59")`).
+3.  **Database Storage**: This date is converted to the equivalent UTC timestamp and saved to MongoDB. 
+4.  **Automatic Hiding**: When students query the notices, the database only returns records where the `expiryDate` is greater than the current time. This guarantees that notices remain fully visible throughout the chosen day and automatically drop off the board at exactly 12:00 AM local time on the next day.
