@@ -157,3 +157,15 @@ How do notice boards automatically expire notices exactly at the end of the day,
 2.  **End-of-Day Parser**: During notice submission, the frontend code explicitly appends the local end-of-day time `T23:59:59` to the date string (e.g. `new Date("2026-06-08T23:59:59")`).
 3.  **Database Storage**: This date is converted to the equivalent UTC timestamp and saved to MongoDB. 
 4.  **Automatic Hiding**: When students query the notices, the database only returns records where the `expiryDate` is greater than the current time. This guarantees that notices remain fully visible throughout the chosen day and automatically drop off the board at exactly 12:00 AM local time on the next day.
+
+### 8. Notice Alert & Pinning System
+How does the system highlight important alerts and lock announcements to the top of the feed?
+1.  **Admin Controls**: When creating or editing a notice, administrators can check two toggles:
+    *   **isPinned (Pin Notice)**: Locks the notice to the very top of the board.
+    *   **isAlert (Mark as Alert)**: Marks the notice as urgent.
+2.  **Smart Sorting**: The backend query sorts notices by `{ isPinned: -1, createdAt: -1 }`. Since `isPinned` is a boolean, notices with `isPinned: true` are returned first, followed by normal notices in reverse-chronological order.
+3.  **Visual Alerts**:
+    *   **Glowing Crimson Border**: Notices with `isAlert: true` get styled with a glowing CSS box-shadow border to make them immediately stand out in the grid.
+    *   **Blinking Badge**: An animated warning light badge (`🚨 ALERT`) pulses at the top-left of the notice card.
+    *   **Sticky Emergency Alert Banner**: A red, high-contrast banner slides in at the top of the student board displaying the active alert title, with an immediate link to open it.
+4.  **Auto-Expiration**: Once a notice's expiry date passes, it is filtered out from active notices, meaning both the pinned card and the top emergency banner automatically disappear.
