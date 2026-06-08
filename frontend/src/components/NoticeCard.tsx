@@ -98,8 +98,7 @@ export const NoticeCard: React.FC<NoticeCardProps> = ({ notice }) => {
               {notice.category}
             </span>
             {notice.isAlert && (
-              <span className="flex items-center space-x-1.5 px-2.5 py-1 text-[10px] font-extrabold text-rose-600 dark:text-rose-455 bg-rose-50 dark:bg-rose-950/30 border border-rose-200/50 dark:border-rose-900/30 rounded-full">
-                <span className="h-1.5 w-1.5 rounded-full bg-rose-500 dark:bg-rose-400 inline-block animate-pulse"></span>
+              <span className="flex items-center px-2.5 py-1 text-[10px] font-extrabold text-rose-600 dark:text-rose-455 bg-rose-50 dark:bg-rose-950/30 border border-rose-200/50 dark:border-rose-900/30 rounded-full">
                 <span>ALERT</span>
               </span>
             )}

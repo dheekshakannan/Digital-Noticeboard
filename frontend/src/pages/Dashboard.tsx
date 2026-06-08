@@ -324,7 +324,7 @@ export const Dashboard: React.FC = () => {
                           </span>
                         )}
                         {notice.isAlert && (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-455 border border-rose-200/50 dark:border-rose-900/30 shrink-0 animate-pulse">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-455 border border-rose-200/50 dark:border-rose-900/30 shrink-0">
                             ALERT
                           </span>
                         )}

@@ -92,12 +92,8 @@ export const Home: React.FC = () => {
       {activeAlertNotice && (
         <div className="mb-8 p-3 px-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 text-rose-800 dark:text-rose-300 flex items-center justify-between shadow-sm animate-fade-in">
           <div className="flex items-center space-x-2.5 truncate">
-            <span className="flex h-2.5 w-2.5 relative shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-600"></span>
-            </span>
             <span className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-455 shrink-0">
-              🚨 Active Alert:
+              🚨 Alert:
             </span>
             <Link 
               to={`/notice/${activeAlertNotice._id}`} 

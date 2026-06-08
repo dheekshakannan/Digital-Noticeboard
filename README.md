@@ -166,6 +166,6 @@ How does the system highlight important alerts and lock announcements to the top
 2.  **Smart Sorting**: The backend query sorts notices by `{ isPinned: -1, createdAt: -1 }`. Since `isPinned` is a boolean, notices with `isPinned: true` are returned first, followed by normal notices in reverse-chronological order.
 3.  **Visual Alerts**:
     *   **Glowing Crimson Border**: Notices with `isAlert: true` get styled with a glowing CSS box-shadow border to make them immediately stand out in the grid.
-    *   **Blinking Badge**: An animated warning light badge (`🚨 ALERT`) pulses at the top-left of the notice card.
-    *   **Sticky Emergency Alert Banner**: A red, high-contrast banner slides in at the top of the student board displaying the active alert title, with an immediate link to open it.
+    *   **Alert Badge**: A clean badge tag (`ALERT`) at the top-left of the notice card.
+    *   **Sticky Emergency Alert Banner**: A red, high-contrast banner at the top of the student board displaying the alert title, with an immediate link to open it.
 4.  **Auto-Expiration**: Once a notice's expiry date passes, it is filtered out from active notices, meaning both the pinned card and the top emergency banner automatically disappear.
