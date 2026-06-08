@@ -164,7 +164,9 @@ export const NoticeForm: React.FC = () => {
     formData.append('title', title.trim());
     formData.append('category', category);
     formData.append('content', content.trim());
-    formData.append('expiryDate', new Date(expiryDate).toISOString());
+    // Expire at the end of the selected day (11:59:59 PM local time)
+    const localExpiryDate = new Date(`${expiryDate}T23:59:59`);
+    formData.append('expiryDate', localExpiryDate.toISOString());
 
     // Send the list of existing attachments we want to preserve
     if (isEditMode) {
