@@ -313,11 +313,23 @@ export const Dashboard: React.FC = () => {
                   <tr key={notice._id} className="text-xs text-slate-700 dark:text-slate-350 hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
                     
                     {/* Title */}
-                    <td className="py-4 px-6 font-bold max-w-[280px] truncate">
-                      <Link to={`/notice/${notice._id}`} className="hover:text-brand-500 dark:hover:text-brand-400 transition-colors" title={notice.title}>
-                        {notice.title}
-                      </Link>
-                      <span className="block text-xxs font-normal text-slate-400 mt-1">
+                    <td className="py-4 px-6 font-bold max-w-[280px]">
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                        <Link to={`/notice/${notice._id}`} className="hover:text-brand-500 dark:hover:text-brand-400 transition-colors line-clamp-1" title={notice.title}>
+                          {notice.title}
+                        </Link>
+                        {notice.isPinned && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30 shrink-0">
+                            PINNED
+                          </span>
+                        )}
+                        {notice.isAlert && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-455 border border-rose-200/50 dark:border-rose-900/30 shrink-0 animate-pulse">
+                            ALERT
+                          </span>
+                        )}
+                      </div>
+                      <span className="block text-[10px] font-normal text-slate-400">
                         Posted {new Date(notice.createdAt).toLocaleDateString()}
                       </span>
                     </td>

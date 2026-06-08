@@ -30,7 +30,7 @@ export const getNotices = async (req: CustomRequest, res: Response): Promise<voi
     }
 
     let notices = await Notice.find(filterQuery)
-      .sort({ createdAt: -1 })
+      .sort({ isPinned: -1, createdAt: -1 })
       .populate('createdBy', 'username');
 
     // If Smart search is activated and we have a search query, run the Gemini parser
@@ -100,7 +100,7 @@ export const getNoticeById = async (req: CustomRequest, res: Response): Promise<
  */
 export const createNotice = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
-    const { title, content, category, expiryDate } = req.body;
+    const { title, content, category, expiryDate, isAlert, isPinned } = req.body;
     
     if (!title || !content || !category || !expiryDate) {
       res.status(400).json({ success: false, message: 'Please fulfill all required fields (title, content, category, expiryDate).' });
@@ -131,6 +131,8 @@ export const createNotice = async (req: CustomRequest, res: Response): Promise<v
       expiryDate: new Date(expiryDate),
       attachments,
       aiSummary,
+      isAlert: isAlert === 'true',
+      isPinned: isPinned === 'true',
       createdBy: req.user?.id
     });
 
@@ -153,7 +155,7 @@ export const createNotice = async (req: CustomRequest, res: Response): Promise<v
  */
 export const updateNotice = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
-    const { title, content, category, expiryDate, keepAttachments } = req.body;
+    const { title, content, category, expiryDate, keepAttachments, isAlert, isPinned } = req.body;
     const noticeId = req.params.id;
 
     const notice = await Notice.findById(noticeId);
@@ -214,6 +216,8 @@ export const updateNotice = async (req: CustomRequest, res: Response): Promise<v
     notice.expiryDate = expiryDate ? new Date(expiryDate) : notice.expiryDate;
     notice.attachments = currentAttachments;
     notice.aiSummary = updatedSummary;
+    notice.isAlert = isAlert !== undefined ? isAlert === 'true' : notice.isAlert;
+    notice.isPinned = isPinned !== undefined ? isPinned === 'true' : notice.isPinned;
 
     await notice.save();
 

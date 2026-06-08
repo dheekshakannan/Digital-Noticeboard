@@ -16,6 +16,8 @@ export interface INotice {
   aiSummary?: string;
   views: number;
   viewedBy: Types.ObjectId[];
+  isAlert: boolean;
+  isPinned: boolean;
   createdBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -40,6 +42,8 @@ const noticeSchema = new Schema<INotice>({
   aiSummary: { type: String, default: '' },
   views: { type: Number, default: 0 },
   viewedBy: { type: [{ type: Schema.Types.ObjectId, ref: 'User' }], default: [] },
+  isAlert: { type: Boolean, default: false },
+  isPinned: { type: Boolean, default: false },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' }
 }, {
   timestamps: true // Automatically adds createdAt and updatedAt fields

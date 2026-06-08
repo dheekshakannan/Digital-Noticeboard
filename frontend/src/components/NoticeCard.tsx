@@ -15,6 +15,8 @@ export interface INotice {
   expiryDate: string;
   aiSummary?: string;
   views: number;
+  isAlert: boolean;
+  isPinned: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -81,19 +83,36 @@ export const NoticeCard: React.FC<NoticeCardProps> = ({ notice }) => {
     return plainText.substring(0, 140) + (plainText.length > 140 ? '...' : '');
   };
 
+  const cardBorderClass = notice.isAlert 
+    ? 'border-red-500/50 dark:border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.08)] hover:shadow-[0_0_20px_rgba(239,68,68,0.15)] bg-rose-50/10 dark:bg-rose-950/5' 
+    : 'border-slate-200/80 dark:border-slate-850 hover:shadow-xl dark:hover:shadow-brand-500/5';
+
   return (
-    <div className="group relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-850 hover:shadow-xl dark:hover:shadow-brand-500/5 transition-all duration-300 hover:-translate-y-1">
+    <div className={`group relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-slate-900 border ${cardBorderClass} transition-all duration-300 hover:-translate-y-1`}>
       <div>
         
         {/* Top Badges */}
         <div className="flex items-center justify-between mb-4">
-          <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getCategoryStyles(notice.category)}`}>
-            {notice.category}
-          </span>
+          <div className="flex items-center space-x-2">
+            <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getCategoryStyles(notice.category)}`}>
+              {notice.category}
+            </span>
+            {notice.isAlert && (
+              <span className="flex items-center space-x-1.5 px-2.5 py-1 text-[10px] font-extrabold text-rose-600 dark:text-rose-455 bg-rose-50 dark:bg-rose-950/30 border border-rose-200/50 dark:border-rose-900/30 rounded-full">
+                <span className="h-1.5 w-1.5 rounded-full bg-rose-500 dark:bg-rose-400 inline-block animate-pulse"></span>
+                <span>ALERT</span>
+              </span>
+            )}
+          </div>
           
-          <div className="flex items-center space-x-1.5 text-xxs font-medium text-slate-400">
-            <Eye className="h-3.5 w-3.5" />
-            <span>{notice.views} views</span>
+          <div className="flex items-center space-x-2">
+            {notice.isPinned && (
+              <span className="text-sm" title="Pinned Announcement">📌</span>
+            )}
+            <div className="flex items-center space-x-1.5 text-xxs font-medium text-slate-400">
+              <Eye className="h-3.5 w-3.5" />
+              <span>{notice.views} views</span>
+            </div>
           </div>
         </div>
 

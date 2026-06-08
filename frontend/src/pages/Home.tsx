@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { NoticeCard } from '../components/NoticeCard';
 import type { INotice } from '../components/NoticeCard';
@@ -21,6 +22,8 @@ export const Home: React.FC = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [triggerSearch, setTriggerSearch] = useState(0);
+
+  const activeAlertNotice = notices.find((n) => n.isAlert);
 
   // Fetch notices from Express API
   useEffect(() => {
@@ -85,7 +88,35 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Interactive Search & Filters Panel */}
+      {/* 2. Emergency Alert Ticker (Only displays if there is an active alert notice) */}
+      {activeAlertNotice && (
+        <div className="mb-8 p-3 px-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 text-rose-800 dark:text-rose-300 flex items-center justify-between shadow-sm animate-fade-in">
+          <div className="flex items-center space-x-2.5 truncate">
+            <span className="flex h-2.5 w-2.5 relative shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-600"></span>
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-455 shrink-0">
+              🚨 Active Alert:
+            </span>
+            <Link 
+              to={`/notice/${activeAlertNotice._id}`} 
+              className="text-xs font-semibold hover:underline truncate hover:text-rose-900 dark:hover:text-rose-100 transition-colors"
+            >
+              {activeAlertNotice.title}
+            </Link>
+          </div>
+          
+          <Link 
+            to={`/notice/${activeAlertNotice._id}`} 
+            className="text-xxs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-950/40 hover:bg-rose-100 dark:hover:bg-rose-900 transition-colors shrink-0 ml-3"
+          >
+            Read Notice
+          </Link>
+        </div>
+      )}
+
+      {/* 3. Interactive Search & Filters Panel */}
       <div className="mb-10 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-850 shadow-md">
         <form onSubmit={handleSearchSubmit} className="space-y-4">
           <div className="flex flex-col md:flex-row gap-3">

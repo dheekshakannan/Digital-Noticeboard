@@ -20,6 +20,8 @@ const noticeSchema = new mongoose_1.Schema({
     aiSummary: { type: String, default: '' },
     views: { type: Number, default: 0 },
     viewedBy: { type: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }], default: [] },
+    isAlert: { type: Boolean, default: false },
+    isPinned: { type: Boolean, default: false },
     createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }
 }, {
     timestamps: true // Automatically adds createdAt and updatedAt fields

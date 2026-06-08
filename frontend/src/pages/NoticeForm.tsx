@@ -28,6 +28,8 @@ export const NoticeForm: React.FC = () => {
   const [category, setCategory] = useState('Academic');
   const [content, setContent] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
+  const [isAlert, setIsAlert] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
   
   // Attachments Queues
   const [newFiles, setNewFiles] = useState<File[]>([]);
@@ -61,6 +63,8 @@ export const NoticeForm: React.FC = () => {
             setExistingAttachments(notice.attachments);
             setKeptAttachmentUrls(notice.attachments.map((att: any) => att.fileUrl));
             setSummaryDraft(notice.aiSummary || '');
+            setIsAlert(notice.isAlert || false);
+            setIsPinned(notice.isPinned || false);
           }
         } catch (err: any) {
           console.error('Error fetching notice for edit:', err);
@@ -167,6 +171,8 @@ export const NoticeForm: React.FC = () => {
     // Expire at the end of the selected day (11:59:59 PM local time)
     const localExpiryDate = new Date(`${expiryDate}T23:59:59`);
     formData.append('expiryDate', localExpiryDate.toISOString());
+    formData.append('isAlert', String(isAlert));
+    formData.append('isPinned', String(isPinned));
 
     // Send the list of existing attachments we want to preserve
     if (isEditMode) {
@@ -279,21 +285,54 @@ export const NoticeForm: React.FC = () => {
 
           </div>
 
-          {/* Notice Expiry picker */}
-          <div className="space-y-1.5 max-w-xs">
-            <label className="text-xs font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wide">
-              Notice Expiry Date *
-            </label>
-            <input
-              type="date"
-              value={expiryDate}
-              onChange={(e) => setExpiryDate(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white cursor-pointer interactive-transition"
-              required
-            />
-            <span className="block text-[10px] text-slate-400 font-medium">
-              Notice will automatically drop off student boards after this date.
-            </span>
+          <div className="flex flex-col sm:flex-row gap-6 pt-2">
+            {/* Notice Expiry picker */}
+            <div className="space-y-1.5 max-w-xs flex-1">
+              <label className="text-xs font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wide">
+                Notice Expiry Date *
+              </label>
+              <input
+                type="date"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white cursor-pointer interactive-transition"
+                required
+              />
+              <span className="block text-[10px] text-slate-400 font-medium">
+                Notice will automatically drop off student boards after this date.
+              </span>
+            </div>
+
+            {/* Alert & Pinning controls */}
+            <div className="flex items-center gap-6 pt-4 sm:pt-6">
+              {/* Pin Switch */}
+              <label className="flex items-center space-x-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={isPinned}
+                  onChange={(e) => setIsPinned(e.target.checked)}
+                  className="rounded border-slate-300 dark:border-slate-800 text-brand-500 accent-brand-500 h-4.5 w-4.5 focus:ring-brand-500 cursor-pointer"
+                />
+                <div>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Pin Notice</span>
+                  <span className="text-[10px] text-slate-450 dark:text-slate-500 block font-medium">Lock to the top of the feed</span>
+                </div>
+              </label>
+
+              {/* Alert Switch */}
+              <label className="flex items-center space-x-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={isAlert}
+                  onChange={(e) => setIsAlert(e.target.checked)}
+                  className="rounded border-slate-300 dark:border-slate-800 text-rose-500 accent-rose-500 h-4.5 w-4.5 focus:ring-rose-500 cursor-pointer"
+                />
+                <div>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Mark as Alert</span>
+                  <span className="text-[10px] text-slate-450 dark:text-slate-500 block font-medium">Highlight with glowing warning styles</span>
+                </div>
+              </label>
+            </div>
           </div>
 
           {/* Description Text Area */}
