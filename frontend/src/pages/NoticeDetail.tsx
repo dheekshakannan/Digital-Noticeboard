@@ -17,6 +17,10 @@ export const NoticeDetail: React.FC = () => {
   // Gallery Modal
   const [activeImageModal, setActiveImageModal] = useState<string | null>(null);
 
+  const backendUrl = import.meta.env.VITE_API_URL 
+    ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
+    : 'http://localhost:5000';
+
   // Web Speech API Voice Reader State
   const [speechSupported, setSpeechSupported] = useState(false);
   const [speechState, setSpeechState] = useState<'idle' | 'playing' | 'paused'>('idle');
@@ -133,9 +137,6 @@ export const NoticeDetail: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     try {
-      const backendUrl = import.meta.env.VITE_API_URL 
-        ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
-        : 'http://localhost:5000';
       const response = await fetch(`${backendUrl}${fileUrl}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const blob = await response.blob();
@@ -150,9 +151,6 @@ export const NoticeDetail: React.FC = () => {
     } catch (error) {
       console.error('Failed to download PDF:', error);
       // Fallback: open in new tab
-      const backendUrl = import.meta.env.VITE_API_URL 
-        ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
-        : 'http://localhost:5000';
       window.open(`${backendUrl}${fileUrl}`, '_blank');
     }
   };
@@ -270,11 +268,11 @@ export const NoticeDetail: React.FC = () => {
                 {images.map((img, i) => (
                   <div 
                     key={i} 
-                    onClick={() => setActiveImageModal(`http://localhost:5000${img.fileUrl}`)}
+                    onClick={() => setActiveImageModal(`${backendUrl}${img.fileUrl}`)}
                     className="relative rounded-2xl border border-slate-200 dark:border-slate-850 overflow-hidden cursor-zoom-in hover:shadow-lg transition-shadow duration-200 bg-slate-100 dark:bg-slate-950 aspect-video group"
                   >
                     <img 
-                      src={`http://localhost:5000${img.fileUrl}`} 
+                      src={`${backendUrl}${img.fileUrl}`} 
                       alt={img.fileName}
                       className="w-full h-full object-cover transform duration-350 group-hover:scale-105" 
                     />
@@ -390,9 +388,6 @@ export const NoticeDetail: React.FC = () => {
             {pdfs.length > 0 ? (
               <div className="space-y-2">
                 {pdfs.map((pdf, idx) => {
-                  const backendUrl = import.meta.env.VITE_API_URL 
-                    ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
-                    : 'http://localhost:5000';
                   return (
                     <div
                       key={idx}
